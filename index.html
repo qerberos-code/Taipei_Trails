@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Taipei Trail Finder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
@@ -22,6 +22,47 @@
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
 .wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:18px}
+.app-layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,760px) minmax(320px,390px);gap:20px;padding-right:16px;align-items:start}
+.wrap{width:100%;min-width:0}
+.chat-sidebar{position:sticky;top:20px;height:calc(100dvh - 40px);min-height:480px;background:var(--surface);border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;overflow:hidden}
+.chat-head{padding:18px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.chat-head h2{margin:0;font-size:20px}
+.chat-head p{margin:0;font-size:13px;color:var(--muted)}
+.chat-heading{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.chat-reset{background:none;border:0;color:var(--accent);cursor:pointer;font:inherit;font-size:13px}
+.chat-context{background:var(--accent-soft);padding:8px 10px;border-radius:9px;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.chat-context button{border:0;background:transparent;color:var(--accent);cursor:pointer}
+.chat-prompts{display:flex;flex-wrap:wrap;gap:6px}
+.chat-prompts button{border:1px solid var(--line);border-radius:999px;padding:6px 9px;background:var(--bg);color:var(--ink);font:inherit;font-size:12px;cursor:pointer}
+.chat-messages{padding:16px;flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
+.chat-message{padding:11px 13px;background:var(--bg);border-radius:12px;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.chat-message.user{background:var(--accent);color:var(--accent-ink);margin-left:28px}
+.chat-message a{color:var(--accent);text-decoration:underline}
+.chat-message.error{color:var(--warn);border:1px solid var(--line)}
+.chat-route{display:block;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;color:var(--ink);font:inherit;cursor:pointer;margin-top:8px}
+.chat-route strong,.chat-route small{display:block}
+.chat-route small{color:var(--muted);font-size:12px}
+.chat-form{padding:12px 16px 16px;border-top:1px solid var(--line);display:grid;gap:8px}
+.chat-form label{font-size:12px;color:var(--muted)}
+.chat-form textarea{resize:vertical;min-height:72px;max-height:180px;max-width:100%;width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:10px;font:inherit}
+.chat-form .btn{justify-self:end}
+.chat-status{margin:0;font-size:12px;color:var(--muted)}
+.chat-toggle,.chat-close{display:none}
+.acts button{font:600 14px var(--f-body);padding:8px 13px;border-radius:10px;border:1px solid var(--accent);color:var(--accent);background:transparent;cursor:pointer}
+@media(max-width:960px){
+  .app-layout{display:block;padding-right:0}.wrap{padding-bottom:90px}
+  .chat-sidebar{display:none}.chat-sidebar.is-open{display:flex;position:fixed;inset:16px 12px 76px;height:auto;min-height:0;z-index:20;box-shadow:0 12px 60px #0004}
+  .chat-toggle{display:block;position:fixed;bottom:20px;right:18px;z-index:21;box-shadow:0 4px 18px #0003}
+  .chat-close{display:block}
+}
+@media(max-width:960px) and (max-height:600px){
+  .chat-head{padding:10px}.chat-head>p,.chat-prompts,.chat-form label{display:none}
+  .chat-form{padding:8px 10px}.chat-form textarea{min-height:48px}
+  .chat-sidebar.is-open{inset:8px 8px 60px}
+}
+.language-control{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:14px}
+.language-control label{font-size:13px;color:var(--muted)}
+.language-control select{width:auto;max-width:170px}
 header h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,7vw,40px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
 header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:16px}
@@ -72,80 +113,81 @@ footer{font-size:12px;color:var(--muted)}
 </style>
 </head><body>
 
-<div class="wrap">
+<div class="app-layout"><main class="wrap">
   <header>
-    <h1>Taipei Trail Finder</h1>
-    <p>Tell it where you're staying and how much time you have. It picks runs and hikes that fit, nearest first.</p>
+    <div class="language-control"><label for="language" data-i18n="language">語言</label><select id="language" aria-label="語言 / Language"><option value="zh-Hant">繁體中文</option><option value="en">English</option></select></div>
+    <h1 data-i18n="title">台北步道探索</h1>
+    <p data-i18n="subtitle">探索大台北路線，和登山助手一起準備裝備、飲水、食物與交通。</p>
   </header>
 
-  <section class="panel" aria-label="Your plan">
+  <section class="panel" aria-label="你的行程" data-i18n-aria-label="plan">
     <div class="loc">
-      <p class="lbl">Where you are starting</p>
+      <p class="lbl" data-i18n="starting">出發地</p>
       <div class="here" id="here"><span class="dot"></span><span id="hereTxt">Taipei 101 / World Trade Center (example)</span></div>
       <div class="locline">
-        <input type="text" id="hotelQ" placeholder="Hotel name, address, or paste a Google Maps link" autocomplete="off">
-        <button class="btn" id="hotelBtn">Set</button>
+        <input type="text" id="hotelQ" placeholder="飯店名稱、地址，或貼上 Google Maps 連結" data-i18n-placeholder="locationPlaceholder" autocomplete="off">
+        <button class="btn" id="hotelBtn" data-i18n="set">設定</button>
       </div>
       <p class="msg" id="locMsg" hidden></p>
-      <select id="station" aria-label="Or pick the nearest MRT station">
-        <option value="">Or pick the nearest MRT station…</option>
+      <select id="station" aria-label="或選擇最近的捷運站…" data-i18n-aria-label="station">
+        <option value="" data-i18n="station">或選擇最近的捷運站…</option>
       </select>
     </div>
 
     <div>
-      <p class="lbl">Activity</p>
+      <p class="lbl" data-i18n="activity">活動類型</p>
       <div class="chips" data-key="act">
-        <button class="chip" data-v="run">Run</button>
-        <button class="chip" data-v="hike">Hike</button>
-        <button class="chip" data-v="any">Either</button>
+        <button class="chip" data-v="run" data-i18n="run">跑步</button>
+        <button class="chip" data-v="hike" data-i18n="hike">健行</button>
+        <button class="chip" data-v="any" data-i18n="either">皆可</button>
       </div>
     </div>
 
     <div class="row2">
       <div>
-        <p class="lbl">Distance</p>
+        <p class="lbl" data-i18n="distance">距離</p>
         <div class="chips" data-key="dist">
           <button class="chip" data-v="3">3 km</button>
           <button class="chip" data-v="5">5 km</button>
           <button class="chip" data-v="10">10 km</button>
-          <button class="chip" data-v="0">Any</button>
+          <button class="chip" data-v="0" data-i18n="any">不限</button>
         </div>
       </div>
       <div>
-        <p class="lbl">Time on the trail</p>
+        <p class="lbl" data-i18n="trailTime">步道活動時間</p>
         <div class="chips" data-key="time">
-          <button class="chip" data-v="30">30 min</button>
-          <button class="chip" data-v="60">1 hr</button>
-          <button class="chip" data-v="120">2 hr</button>
-          <button class="chip" data-v="240">Half day</button>
-          <button class="chip" data-v="0">Any</button>
+          <button class="chip" data-v="30" data-i18n="time30">30 分鐘</button>
+          <button class="chip" data-v="60" data-i18n="time60">1 小時</button>
+          <button class="chip" data-v="120" data-i18n="time120">2 小時</button>
+          <button class="chip" data-v="240" data-i18n="halfDay">半天</button>
+          <button class="chip" data-v="0" data-i18n="any">不限</button>
         </div>
       </div>
     </div>
 
     <div class="row2">
       <div>
-        <p class="lbl">Max travel each way</p>
+        <p class="lbl" data-i18n="travelLimit">單程交通時間上限</p>
         <div class="chips" data-key="travel">
-          <button class="chip" data-v="15">15 min</button>
-          <button class="chip" data-v="30">30 min</button>
-          <button class="chip" data-v="60">1 hr</button>
-          <button class="chip" data-v="0">Any</button>
+          <button class="chip" data-v="15" data-i18n="time15">15 分鐘</button>
+          <button class="chip" data-v="30" data-i18n="time30">30 分鐘</button>
+          <button class="chip" data-v="60" data-i18n="time60">1 小時</button>
+          <button class="chip" data-v="0" data-i18n="any">不限</button>
         </div>
       </div>
       <div class="row2" style="gap:10px">
         <div>
-          <p class="lbl">Run pace</p>
-          <select id="pace">
+          <p class="lbl" data-i18n="pace">跑步配速</p>
+          <select id="pace" data-i18n-aria-label="pace" aria-label="跑步配速">
             <option value="5">5:00 /km</option><option value="5.5">5:30 /km</option>
             <option value="6">6:00 /km</option><option value="6.5">6:30 /km</option>
             <option value="7">7:00 /km</option><option value="8">8:00 /km</option>
           </select>
         </div>
         <div>
-          <p class="lbl">Hike style</p>
-          <select id="hike">
-            <option value="1.25">Relaxed</option><option value="1">Steady</option><option value="0.8">Fast</option>
+          <p class="lbl" data-i18n="hikeStyle">健行步調</p>
+          <select id="hike" data-i18n-aria-label="hikeStyle" aria-label="健行步調">
+            <option value="1.25" data-i18n="relaxed">悠閒</option><option value="1" data-i18n="steady">穩定</option><option value="0.8" data-i18n="fast">快速</option>
           </select>
         </div>
       </div>
@@ -153,36 +195,42 @@ footer{font-size:12px;color:var(--muted)}
   </section>
 
   <section aria-live="polite">
-    <div class="summary"><h2 id="sumTitle">Best picks</h2><span id="sumSub"></span></div>
+    <div class="summary"><h2 id="sumTitle" data-i18n="bestPicks">推薦路線</h2><span id="sumSub"></span></div>
     <div class="list" id="list" style="margin-top:10px"></div>
   </section>
 
-  <footer>
-    Estimates: running uses your pace plus about 6 min per 100 m of climb. Hiking uses 15 min/km plus 10 min per 100 m of climb (Naismith's rule), scaled by hike style. Travel is a straight-line guess for MRT or taxi; tap Navigate for real transit times. Distances and climbs are approximate. Check trail conditions, heat, and typhoon or heavy-rain closures before you go.
-  </footer>
-</div>
+  <footer data-i18n="footer">估算方式：跑步依所選配速，加上每爬升 100 公尺約 6 分鐘；健行以每公里 15 分鐘，加上每爬升 100 公尺約 10 分鐘（Naismith 法則），再依健行步調調整。交通時間依直線距離粗估捷運或計程車車程，請按「導航」確認實際大眾運輸時間。距離與爬升皆為約略值。出發前請確認步道狀況、高溫，以及颱風或豪雨封閉資訊。</footer>
+</main>
+<aside class="chat-sidebar" id="chatSidebar" aria-label="登山助手" data-i18n-aria-label="chatTitle">
+  <div class="chat-head">
+    <div class="chat-heading"><h2 data-i18n="chatTitle">登山助手</h2><div><button class="chat-reset" id="chatReset" type="button" data-i18n="chatReset">新對話</button><button class="chat-reset chat-close" id="chatClose" type="button" aria-label="關閉聊天" data-i18n-aria-label="chatClose" data-i18n="close">關閉</button></div></div>
+    <p data-i18n="chatSubtitle">聊路線、裝備、帶多少水與食物，以及怎麼抵達。</p>
+    <label class="hint" for="chatExperience" data-i18n="experience">登山經驗（可在對話中調整）</label>
+    <select id="chatExperience"><option value="beginner" data-i18n="beginner">新手</option><option value="intermediate" data-i18n="intermediate">熟手</option><option value="expert" data-i18n="expert">專家</option></select>
+    <div class="chat-context"><span id="chatContext" data-i18n="noTrail">尚未選擇步道，可直接描述需求</span><button id="chatUnselect" type="button" hidden aria-label="取消選取步道" data-i18n-aria-label="unselect">×</button></div>
+    <div class="chat-prompts">
+      <button type="button" data-prompt="請依照我的登山經驗、距離和時間條件推薦步道。" data-prompt-key="promptRoutesText" data-i18n="promptRoutes">推薦步道</button>
+      <button type="button" data-prompt="這次健行需要帶哪些裝備？每樣要帶多少？" data-prompt-key="promptGearText" data-i18n="promptGear">裝備清單</button>
+      <button type="button" data-prompt="我需要帶多少水和食物？請提供每人份量與估算依據。" data-prompt-key="promptFoodText" data-i18n="promptFood">水與食物</button>
+      <button type="button" data-prompt="從目前出發地搭大眾運輸怎麼去這條步道？" data-prompt-key="promptTransportText" data-i18n="promptTransport">交通方式</button>
+    </div>
+  </div>
+  <div class="chat-messages" id="chatMessages" role="log" aria-label="聊天紀錄" data-i18n-aria-label="chatLog" aria-live="polite"></div>
+  <form class="chat-form" id="chatForm">
+    <label for="chatInput" data-i18n="chatInputLabel">描述你的需求，或先在步道卡片按「與 AI 討論」</label>
+    <textarea id="chatInput" maxlength="3000" placeholder="例如：我是新手，想去北投，走兩小時，要帶多少水？" data-i18n-placeholder="chatPlaceholder" required></textarea>
+    <p class="chat-status" id="chatStatus" role="status" data-i18n="chatChecking">正在確認 AI 連線…</p>
+    <button class="btn" id="chatSend" type="submit" data-i18n="chatSend">傳送訊息</button>
+  </form>
+</aside></div>
+<button class="btn chat-toggle" id="chatToggle" type="button" aria-controls="chatSidebar" aria-expanded="false" data-i18n="chatToggle">聊聊登山計畫</button>
 
-<script>
-const TRAILS=[
- {n:"Da'an Forest Park loop",zh:"大安森林公園",t:"run",lat:25.0300,lng:121.5357,km:2.3,gain:0,flex:15,mrt:"Daan Park",note:"Flat shaded loop in the city center. Add laps to reach any distance."},
- {n:"Elephant Mountain",zh:"象山步道",t:"hike",lat:25.0275,lng:121.5707,km:1.8,gain:180,mrt:"Xiangshan",note:"Steep stairs to the classic Taipei 101 viewpoint. Busy at sunset."},
- {n:"Four Beasts Mountain loop",zh:"四獸山",t:"both",lat:25.0275,lng:121.5707,km:5.5,gain:380,mrt:"Xiangshan",note:"Links Elephant, Tiger, Leopard and Lion peaks. Good trail-run workout."},
- {n:"Tiger Mountain trail",zh:"虎山步道",t:"hike",lat:25.0362,lng:121.5810,km:3,gain:200,mrt:"Houshanpi (bus) / Xiangshan",note:"Quieter forest trail with streams and city views."},
- {n:"Taipei Expo Park & Xinsheng Park",zh:"花博公園",t:"run",lat:25.0705,lng:121.5235,km:3,gain:0,flex:12,mrt:"Yuanshan",note:"Flat paved loops around the Expo grounds and Fine Arts Museum."},
- {n:"Dajia Riverside Park",zh:"大佳河濱公園",t:"run",lat:25.0730,lng:121.5370,km:5,gain:0,flex:20,mrt:"Jiannan Rd / Dazhi",note:"Wide riverside path on the Keelung River. Out-and-back to any length."},
- {n:"Meiti Riverside Park",zh:"美堤河濱公園",t:"run",lat:25.0790,lng:121.5550,km:5,gain:0,flex:20,mrt:"Jiannan Rd",note:"Flat river path with views of Miramar Ferris wheel. Connects to Dajia."},
- {n:"Rainbow Riverside Park",zh:"彩虹河濱公園",t:"run",lat:25.0560,lng:121.5760,km:5,gain:0,flex:16,mrt:"Songshan",note:"East-side riverside path by Rainbow Bridge and Raohe Night Market."},
- {n:"Dadaocheng Wharf river path",zh:"大稻埕碼頭",t:"run",lat:25.0566,lng:121.5084,km:5,gain:0,flex:20,mrt:"Beimen / Daqiaotou",note:"Tamsui River path heading north. Great at sunset."},
- {n:"Jiantan Mountain trail",zh:"劍潭山步道",t:"both",lat:25.0838,lng:121.5290,km:3.5,gain:170,mrt:"Jiantan",note:"Ridge above the Grand Hotel with wide city views."},
- {n:"Jinmianshan (Golden Face Rock)",zh:"金面山",t:"hike",lat:25.0828,lng:121.5672,km:3,gain:250,mrt:"Xihu",note:"Rocky scramble to a big view over Neihu and Taipei 101."},
- {n:"Junjianyan (Battleship Rock)",zh:"軍艦岩",t:"hike",lat:25.1255,lng:121.5130,km:3,gain:150,mrt:"Shipai / Qilian",note:"Short loop to a sandstone outcrop above Beitou."},
- {n:"Tianmu Old Trail",zh:"天母古道",t:"hike",lat:25.1300,lng:121.5340,km:4,gain:300,mrt:"Zhishan (then bus)",note:"About 1,800 steps along an old water pipe. Out-and-back to Sanjiao Puzi."},
- {n:"Zhinan Temple stairs",zh:"指南宮步道",t:"hike",lat:24.9790,lng:121.5800,km:2.5,gain:250,mrt:"Taipei Zoo / Zhengda",note:"Stone stairs up to the Zhinan Temple complex. Combine with Maokong."},
- {n:"Bitan riverside",zh:"碧潭",t:"run",lat:24.9570,lng:121.5370,km:4,gain:0,flex:12,mrt:"Xindian",note:"Flat path along the Xindian River by the suspension bridge."},
- {n:"Zhongzheng Mountain",zh:"中正山",t:"hike",lat:25.1490,lng:121.5050,km:4.5,gain:400,mrt:"Beitou (then bus)",note:"Steady climb with a top view over the Guandu plain and Tamsui River."},
- {n:"Qixing Mountain summit",zh:"七星山",t:"hike",lat:25.1810,lng:121.5480,km:5,gain:450,mrt:"Bus from Jiantan / Shilin",note:"Taipei's highest peak (1,120 m). Volcanic vents and big views. Go early."},
- {n:"Huangdi Dian ridge",zh:"皇帝殿",t:"hike",lat:24.9940,lng:121.6420,km:7,gain:450,mrt:"Bus from Muzha",note:"Exposed rocky knife-edge ridge with chains. Experienced hikers, dry days only."}
-];
+<script type="module">
+import { TRAILS } from "./trails.js";
+import { initChat } from "./chat-ui.js";
+import { initI18n, t, getLocale, formatDuration, localizeTrail, localizeStation, localizeOrigin, onLocaleChange } from "./i18n.js";
+initI18n();
+
 const STATIONS=[
  ["Taipei Main Station",25.0478,121.5170],["Ximen",25.0420,121.5081],["Zhongshan",25.0527,121.5203],["Shuanglian",25.0577,121.5206],
  ["Minquan W. Rd",25.0626,121.5193],["Yuanshan",25.0713,121.5201],["Dongmen",25.0339,121.5287],["Daan",25.0330,121.5435],
@@ -192,19 +240,20 @@ const STATIONS=[
  ["Tamsui",25.1678,121.4455],["Banqiao",25.0141,121.4630]
 ];
 const S={act:"any",dist:"5",time:"60",travel:"30",pace:"6",hike:"1",
-  origin:{name:"Taipei 101 / World Trade Center (example)",lat:25.0330,lng:121.5637}};
+  origin:{kind:"example",name:"Taipei 101 / World Trade Center (example)",lat:25.0330,lng:121.5637}};
 try{const saved=JSON.parse(localStorage.getItem("ttf")||"null");if(saved)Object.assign(S,saved)}catch(e){}
 const save=()=>{try{localStorage.setItem("ttf",JSON.stringify(S))}catch(e){}};
 const $=id=>document.getElementById(id);
 
 const stSel=$("station");
-STATIONS.forEach(([n],i)=>{const o=document.createElement("option");o.value=i;o.textContent=n;stSel.appendChild(o)});
+STATIONS.forEach(([n],i)=>{const o=document.createElement("option");o.value=i;o.textContent=localizeStation(n);stSel.appendChild(o)});
 $("pace").value=S.pace;$("hike").value=S.hike;
 
 function hav(a,b,c,d){const R=6371,r=x=>x*Math.PI/180;const dl=r(c-a),dn=r(d-b);
   const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function travelMin(km){return Math.round(8+(km*1.35)/22*60)}
-function fmt(m){m=Math.round(m);if(m<60)return m+" min";const h=Math.floor(m/60),r=m%60;return h+"h"+(r?(" "+String(r).padStart(2,"0")):"")}
+const fmt=formatDuration;
+const tText=t;
 function canRun(t){return t.t==="run"||t.t==="both"}
 function canHike(t){return t.t==="hike"||t.t==="both"}
 
@@ -219,10 +268,10 @@ function plan(t,mode){
   if(t.flex){
     if(D){ if(D>t.flex) return null; km=D; }
     else if(T){ km=Math.min(t.flex,Math.max(2,Math.floor(T/perKm*2)/2)); }
-    how = t.km<3 ? `${(km/t.km).toFixed(1).replace(/\.0$/,"")} laps of the ${t.km} km loop` : `Out-and-back, turn around at ${(km/2).toFixed(1).replace(/\.0$/,"")} km`;
+    how = t.km<3 ? tText("laps", {laps:(km/t.km).toFixed(1).replace(/\.0$/,""),km:t.km}) : tText("outAndBack", {km:(km/2).toFixed(1).replace(/\.0$/,"")});
   }else{
     if(D && (km<D*0.55||km>D*1.6)) return null;
-    how = "Full route";
+    how = tText("fullRoute");
   }
   const mins = t.flex ? km*perKm : estimate(t,mode,km);
   if(T && mins>T*1.1) return null;
@@ -233,7 +282,7 @@ function plan(t,mode){
 function render(){
   document.querySelectorAll(".chips").forEach(g=>{const k=g.dataset.key;
     g.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===S[k])))});
-  $("hereTxt").innerHTML="";const b=document.createElement("b");b.textContent=S.origin.name;$("hereTxt").append("From ",b);
+  $("hereTxt").innerHTML="";const b=document.createElement("b");b.textContent=localizeOrigin(S.origin);$("hereTxt").append(tText("from"),b);
   const o=S.origin,maxT=+S.travel,res=[];
   TRAILS.forEach(t=>{
     const modes=[];if((S.act==="run"||S.act==="any")&&canRun(t))modes.push("run");
@@ -245,27 +294,27 @@ function render(){
   });
   res.sort((a,b)=>(a.tr+a.fit*25)-(b.tr+b.fit*25));
   const list=$("list");list.innerHTML="";
-  const parts=[];if(+S.dist)parts.push(S.dist+" km");if(+S.time)parts.push(fmt(+S.time)+" on trail");if(+S.travel)parts.push("≤ "+S.travel+" min away");
-  $("sumTitle").textContent=res.length?`${res.length} route${res.length>1?"s":""} that fit`:"No exact match";
+  const parts=[];if(+S.dist)parts.push(S.dist+" km");if(+S.time)parts.push(tText("summaryTrail",{duration:fmt(+S.time)}));if(+S.travel)parts.push(tText("summaryTravel",{minutes:S.travel}));
+  $("sumTitle").textContent=res.length?tText(res.length===1?"routeOne":"routeCount",{count:res.length}):tText("noMatch");
   $("sumSub").textContent=parts.join(" · ");
-  if(!res.length){list.innerHTML='<div class="empty">Nothing fits all three limits. Try "Any" for travel time, or a longer time window.</div>';return}
+  if(!res.length){const empty=document.createElement("div");empty.className="empty";empty.textContent=tText("empty");list.append(empty);return}
   res.slice(0,8).forEach((r,i)=>{
-    const t=r.t,c=document.createElement("article");c.className="card"+(i===0?" top":"");
+    const t=localizeTrail(r.t),c=document.createElement("article");c.className="card"+(i===0?" top":"");
     const dest=`${t.lat},${t.lng}`,orig=`${o.lat},${o.lng}`;
     const nav=`https://www.google.com/maps/dir/?api=1&origin=${orig}&destination=${dest}&travelmode=transit`;
     const info=`https://www.google.com/search?q=${encodeURIComponent(t.zh+" "+t.n+" trail")}`;
     const total=r.mins+r.tr*2;
-    c.innerHTML=`<div class="ctop"><h3></h3><span class="badge">${i===0?"Top pick · ":""}${r.mode==="run"?"Run":"Hike"}</span></div>
+    c.innerHTML=`<div class="ctop"><h3></h3><span class="badge">${i===0?tText("topPick"):""}${tText(r.mode)}</span></div>
       <div class="stats">
-        <div class="stat"><small>Distance</small><strong>${r.km.toFixed(1)} km</strong></div>
-        <div class="stat"><small>Climb</small><strong>${t.flex?0:t.gain} m</strong></div>
-        <div class="stat"><small>On trail</small><strong>${fmt(r.mins)}</strong></div>
-        <div class="stat tr"><small>Travel each way</small><strong>${fmt(r.tr)}</strong></div>
+        <div class="stat"><small>${tText("distance")}</small><strong>${r.km.toFixed(1)} km</strong></div>
+        <div class="stat"><small>${tText("climb")}</small><strong>${t.flex?0:t.gain} m</strong></div>
+        <div class="stat"><small>${tText("onTrail")}</small><strong>${fmt(r.mins)}</strong></div>
+        <div class="stat tr"><small>${tText("travelEachWay")}</small><strong>${fmt(r.tr)}</strong></div>
       </div>
       <p class="plan"></p><p class="note"></p>
-      <div class="acts"><a class="go" target="_blank" rel="noopener" href="${nav}">Navigate</a><a class="info" target="_blank" rel="noopener" href="${info}">Trail info</a></div>`;
-    const h=c.querySelector("h3");h.textContent=t.n;const z=document.createElement("span");z.className="zh";z.textContent=t.zh;h.append(z);
-    c.querySelector(".plan").textContent=`${r.how}. Nearest MRT: ${t.mrt}. Door to door about ${fmt(total)}.`;
+      <div class="acts"><a class="go" target="_blank" rel="noopener" href="${nav}">${tText("navigate")}</a><a class="info" target="_blank" rel="noopener" href="${info}">${tText("trailInfo")}</a><button type="button" data-chat-trail="${t.id}">${tText("discuss")}</button></div>`;
+    const h=c.querySelector("h3");h.textContent=t.name;const z=document.createElement("span");z.className="zh";z.textContent=getLocale()==="en"?t.zh:t.n;h.append(" ",z);
+    c.querySelector(".plan").textContent=tText("routePlan",{plan:r.how,mrt:t.mrt,duration:fmt(total)});
     c.querySelector(".note").textContent=t.note;
     list.appendChild(c);
   });
@@ -276,9 +325,9 @@ document.querySelectorAll(".chips").forEach(g=>g.addEventListener("click",e=>{
 $("pace").onchange=e=>{S.pace=e.target.value;save();render()};
 $("hike").onchange=e=>{S.hike=e.target.value;save();render()};
 stSel.onchange=e=>{if(e.target.value==="")return;const s=STATIONS[+e.target.value];
-  S.origin={name:s[0]+" MRT",lat:s[1],lng:s[2]};hideMsg();save();render()};
+  S.origin={kind:"station",stationName:s[0],name:s[0]+" MRT",lat:s[1],lng:s[2]};hideMsg();save();render()};
 
-function showMsg(t){const m=$("locMsg");m.textContent=t;m.hidden=false}
+function showMsg(key){const m=$("locMsg");m.dataset.i18n=key;m.textContent=tText(key);m.hidden=false}
 function hideMsg(){$("locMsg").hidden=true}
 
 let samplerP=null;
@@ -287,20 +336,25 @@ function getSampler(){ if(!samplerP) samplerP=(window.claude?.use?window.claude.
 async function setHotel(){
   const q=$("hotelQ").value.trim();if(!q)return;hideMsg();
   const m=q.match(/@?(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{2,3}\.\d{3,})/);
-  if(m){S.origin={name:"Pinned location",lat:+m[1],lng:+m[2]};save();render();$("hotelQ").value="";return}
-  const btn=$("hotelBtn");btn.disabled=true;btn.textContent="Finding…";
+  if(m){S.origin={kind:"pinned",name:"Pinned location",lat:+m[1],lng:+m[2]};save();render();$("hotelQ").value="";return}
+  const btn=$("hotelBtn");btn.disabled=true;btn.dataset.i18n="finding";btn.textContent=tText("finding");
   try{
     const sample=await getSampler();
-    if(!sample){showMsg("Hotel lookup isn't available here. Paste coordinates or a Google Maps link, or pick the nearest MRT station.");return}
+    if(!sample){showMsg("lookupUnavailable");return}
     const r=await sample.json(`You geocode places in the Taipei / New Taipei area of Taiwan. Place: "${q.replace(/"/g,"'")}". Reply with JSON only: {"found":boolean,"name":"short display name","lat":number,"lng":number}. Use your best knowledge of the hotel or address location. If you do not recognize it, return found:false.`,{modelTier:"quick"});
     if(r&&r.found&&isFinite(r.lat)&&isFinite(r.lng)&&r.lat>24.6&&r.lat<25.4&&r.lng>121.2&&r.lng<122.1){
-      S.origin={name:(r.name||q)+" (approx.)",lat:+r.lat,lng:+r.lng};save();render();$("hotelQ").value="";stSel.value="";
-    }else showMsg("Couldn't place that one. Try the full hotel name with the district, paste a Google Maps link, or pick the nearest MRT station.");
-  }catch(e){showMsg(e&&e.code==="not_granted"?"Hotel lookup needs permission. Pick the nearest MRT station instead.":"Lookup failed. Pick the nearest MRT station or paste coordinates.")}
-  finally{btn.disabled=false;btn.textContent="Set"}
+      S.origin={kind:"approximate",name:(r.name||q),lat:+r.lat,lng:+r.lng};save();render();$("hotelQ").value="";stSel.value="";
+    }else showMsg("lookupNotFound");
+  }catch(e){showMsg(e&&e.code==="not_granted"?"lookupPermission":"lookupFailed")}
+  finally{btn.disabled=false;btn.dataset.i18n="set";btn.textContent=tText("set")}
 }
 $("hotelBtn").onclick=setHotel;
 $("hotelQ").addEventListener("keydown",e=>{if(e.key==="Enter")setHotel()});
+onLocaleChange(() => {
+  STATIONS.forEach(([name], i) => stSel.options[i+1].textContent=localizeStation(name));
+  render();
+});
 render();
+initChat(() => ({origin:{...S.origin,name:localizeOrigin(S.origin)},maxDistanceKm:+S.dist||null,maxMinutes:+S.time||null}));
 </script>
 </body></html>

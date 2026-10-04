@@ -1,0 +1,23 @@
+{
+  "name": "taipei-trail-finder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "dev": "node --watch --env-file-if-exists=.env server/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.2.14",
+    "@langchain/openai": "^1.6.2",
+    "@langfuse/langchain": "^5.11.1",
+    "@langfuse/otel": "^5.11.1",
+    "@opentelemetry/sdk-node": "^0.222.0",
+    "langchain": "^1.5.15",
+    "zod": "^4.6.5"
+  }
+}
