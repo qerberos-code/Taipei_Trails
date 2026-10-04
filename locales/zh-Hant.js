@@ -1,5 +1,7 @@
 export default {
   profileTitle: '個人與活動設定',
+  settings: '設定', profileExpand: '展開個人與活動設定', profileCollapse: '收合個人與活動設定',
+  chatExpand: '展開聊天', chatCollapse: '收合聊天',
   profileIntro: '自動帶入每次 AI 規劃，不用重複輸入。',
   profilePeople: '活動人數（含自己）',
   profileAge: '年齡（歲，選填）',

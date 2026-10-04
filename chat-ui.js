@@ -24,8 +24,7 @@ function appendTextWithLinks(element, text) {
   element.append(document.createTextNode(text.slice(cursor)));
 }
 
-export function initChat(getPageContext) {
-  const sidebar = byId('chatSidebar');
+export function initChat(getPageContext, { openChat }) {
   const log = byId('chatMessages');
   const input = byId('chatInput');
   const submit = byId('chatSend');
@@ -33,13 +32,6 @@ export function initChat(getPageContext) {
   let history = [];
   let selectedTrailId = null;
   let busy = false;
-
-  function openChat(open = true) {
-    sidebar.classList.toggle('is-open', open);
-    byId('chatToggle').setAttribute('aria-expanded', String(open));
-    if (open) input.focus();
-    else byId('chatToggle').focus();
-  }
 
   function selectTrail(id) {
     const trail = TRAILS.find(t => t.id === id);
@@ -103,11 +95,6 @@ export function initChat(getPageContext) {
     submit.textContent = t(submit.dataset.i18n);
   }
 
-  byId('chatToggle').onclick = () => openChat(!sidebar.classList.contains('is-open'));
-  byId('chatClose').onclick = () => openChat(false);
-  sidebar.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && sidebar.classList.contains('is-open')) openChat(false);
-  });
   byId('chatUnselect').onclick = () => {
     selectedTrailId = null;
     renderContext();
@@ -178,7 +165,7 @@ export function initChat(getPageContext) {
         : error.name === 'TimeoutError' ? 'timeout'
         : error instanceof TypeError ? 'chatConnection' : error.translationKey || 'chatUnavailable';
       translatedBubble(key, true); input.value = text; setStatus('chatUndelivered');
-    } finally { setBusy(false); input.focus(); }
+    } finally { setBusy(false); if (!byId('chatSidebar').hidden) input.focus(); }
   });
 
   onLocaleChange(() => {

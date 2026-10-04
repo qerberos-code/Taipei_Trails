@@ -9,7 +9,7 @@
  * @property {string} personalNotes
  */
 
-export function initProfile() {
+export function initProfile(openProfile) {
   const form = document.getElementById('profileForm');
   const fields = {
     people: document.getElementById('profilePeople'),
@@ -46,5 +46,10 @@ export function initProfile() {
     if (!form.checkValidity()) return;
     try { localStorage.setItem('ttf-profile', JSON.stringify(readProfile())); } catch { /* Still usable without storage. */ }
   });
-  return () => form.reportValidity() ? readProfile() : null;
+  return () => {
+    if (form.checkValidity()) return readProfile();
+    openProfile();
+    form.reportValidity();
+    return null;
+  };
 }

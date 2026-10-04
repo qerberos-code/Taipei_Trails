@@ -1,5 +1,7 @@
 export default {
   profileTitle: 'Personal & group settings',
+  settings: 'Settings', profileExpand: 'Expand personal & group settings', profileCollapse: 'Collapse personal & group settings',
+  chatExpand: 'Expand chat', chatCollapse: 'Collapse chat',
   profileIntro: 'Included in every AI request, so you only need to enter them once.',
   profilePeople: 'Group size (including you)',
   profileAge: 'Age (years, optional)',
