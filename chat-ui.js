@@ -96,7 +96,6 @@ export function initChat(getPageContext) {
     submit.disabled = value;
     input.disabled = value;
     byId('chatReset').disabled = value;
-    byId('chatExperience').disabled = value;
     byId('chatUnselect').disabled = value;
     log.setAttribute('aria-busy', String(value));
     document.querySelectorAll('[data-prompt], [data-chat-trail]').forEach(button => button.disabled = value);
@@ -135,7 +134,9 @@ export function initChat(getPageContext) {
     const text = input.value.trim();
     if (!text || busy) return;
     const messages = [...history.slice(-18), { role: 'user', content: text }];
-    const context = { ...getPageContext(), selectedTrailId, experience: byId('chatExperience').value };
+    const pageContext = getPageContext();
+    if (!pageContext) { setStatus('profileInvalid'); return; }
+    const context = { ...pageContext, selectedTrailId };
     bubble('user', text); input.value = ''; setBusy(true);
     const waiting = translatedBubble('chatWaiting');
     try {

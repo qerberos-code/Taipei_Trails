@@ -67,6 +67,50 @@ test('missing duration triggers a tool clarification instead of made-up quantiti
   assert.equal(result.sources.length, 0);
 });
 
+test('sidebar profile reaches the agent and supplies group size to the preparation tool', async () => {
+  const model = new ScriptedModel([
+    toolCall('plan_preparation', { trailId: null, hours: 2, people: null, heat: 'normal' }),
+    new AIMessage('三人請各自準備水與裝備。'),
+  ]);
+  const context = {
+    people: 3, age: 35, heightCm: 172.5, weightKg: 68.5,
+    experience: 'intermediate', intensity: 'low', personalNotes: '習慣背 20L 背包，帶 1.5L 水和登山杖。',
+  };
+  await chatWithTrails(chatRequestSchema.parse({ context, messages: [{ role: 'user', content: '要帶多少水？' }] }), { model });
+  const content = model.seen[0].find(message => message._getType() === 'system').content;
+  const system = typeof content === 'string' ? content : content.map(block => block.text ?? '').join('\n');
+  for (const [key, value] of Object.entries(context)) {
+    assert.ok(system.includes(JSON.stringify(key) + ':' + JSON.stringify(value)), `Profile field missing: ${key}`);
+  }
+  const output = JSON.parse(model.seen[1].find(message => message._getType() === 'tool').content);
+  assert.equal(output.people, 3);
+  assert.deepEqual(output.waterLitersForGroup, [4.5, 4.5]);
+});
+
+test('explicit conversation group size overrides sidebar size', async () => {
+  const model = new ScriptedModel([
+    toolCall('plan_preparation', { trailId: null, hours: 2, people: 2, heat: 'normal' }),
+    new AIMessage('這次以兩人規劃。'),
+  ]);
+  await chatWithTrails(chatRequestSchema.parse({
+    context: { people: 5 }, messages: [{ role: 'user', content: '這次兩個人走兩小時。' }],
+  }), { model });
+  const output = JSON.parse(model.seen[1].find(message => message._getType() === 'tool').content);
+  assert.equal(output.people, 2);
+  assert.deepEqual(output.waterLitersForGroup, [3, 3]);
+});
+
+test('older requests receive defaults and optional body details remain unknown', () => {
+  const emptyContext = chatRequestSchema.parse({ messages: [{ role: 'user', content: '推薦步道' }] }).context;
+  const partialContext = chatRequestSchema.parse({ context: { experience: 'expert' }, messages: [{ role: 'user', content: '推薦步道' }] }).context;
+  assert.equal(emptyContext.people, 1);
+  assert.equal(partialContext.people, 1);
+  assert.equal(partialContext.experience, 'expert');
+  for (const key of ['age', 'heightCm', 'weightKg']) assert.equal(emptyContext[key], null);
+  assert.equal(emptyContext.intensity, 'moderate');
+  assert.equal(emptyContext.personalNotes, '');
+});
+
 test('English locale controls the next reply even with Traditional Chinese chat history', async () => {
   const model = new ScriptedModel([new AIMessage('Which district would you like to explore?')]);
   const result = await chatWithTrails(chatRequestSchema.parse({

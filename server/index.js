@@ -11,6 +11,7 @@ const staticFiles = new Map([
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
   ['/trails.js', ['trails.js', 'text/javascript; charset=utf-8']],
   ['/chat-ui.js', ['chat-ui.js', 'text/javascript; charset=utf-8']],
+  ['/profile-ui.js', ['profile-ui.js', 'text/javascript; charset=utf-8']],
   ...['i18n.js', 'locales/en.js', 'locales/zh-Hant.js', 'locales/trails-zh-Hant.js'].map(path => [`/${path}`, [path, 'text/javascript; charset=utf-8']]),
 ]);
 

@@ -60,7 +60,7 @@ test('locale reaches chat, localized errors have stable codes, and only catalog 
     assert.equal((await post(url, { ...payload, locale: 'fr' })).status, 400);
     const wrongMethod = await fetch(`${url}/api/chat`, { headers: { 'Accept-Language': 'en-US,en;q=0.9' } });
     assert.deepEqual(await wrongMethod.json(), { error: 'Use POST to send chat messages.', code: 'apiMethod' });
-    for (const path of ['/i18n.js', '/locales/en.js', '/locales/zh-Hant.js', '/locales/trails-zh-Hant.js']) {
+    for (const path of ['/profile-ui.js', '/i18n.js', '/locales/en.js', '/locales/zh-Hant.js', '/locales/trails-zh-Hant.js']) {
       const response = await fetch(url + path);
       assert.equal(response.status, 200);
       assert.match(response.headers.get('content-type'), /javascript/);
@@ -73,5 +73,19 @@ test('locale reaches chat, localized errors have stable codes, and only catalog 
     const data = await response.json();
     assert.equal(data.code, 'apiUnconfigured');
     assert.match(data.error, /^AI is not configured/);
+  });
+});
+
+test('personal settings are validated at the API boundary and preserved for chat', async () => {
+  let captured;
+  await withServer({ hasApiKey: () => true, chat: async input => { captured = input; return { reply: '已帶入個人設定。' }; } }, async url => {
+    const context = { people: 4, age: 40, heightCm: 170.5, weightKg: 65, experience: 'expert', intensity: 'high', personalNotes: '25L 背包，帶雨衣' };
+    assert.equal((await post(url, { ...payload, context })).status, 200);
+    for (const [key, value] of Object.entries(context)) assert.equal(captured.context[key], value);
+    for (const invalid of [
+      { people: 0 }, { people: 21 }, { people: 1.5 }, { age: -1 }, { age: 25.5 },
+      { heightCm: 0 }, { weightKg: 301 }, { intensity: 'extreme' },
+      { experience: 'automatic' }, { personalNotes: 'x'.repeat(1501) },
+    ]) assert.equal((await post(url, { ...payload, context: invalid })).status, 400);
   });
 });
