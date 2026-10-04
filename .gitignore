@@ -1,1 +1,8 @@
 .idea/
+.DS_Store
+node_modules/
+.playwright-cli/
+output/playwright/
+.env
+.env.*
+!.env.example

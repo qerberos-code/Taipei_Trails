@@ -1,0 +1,21 @@
+// Display translations only; route IDs, coordinates, and measurements stay in trails.js.
+export default {
+  'daan-park': { mrt: '大安森林公園', note: '市中心平坦且有樹蔭的環線，可增加圈數達到目標距離。' },
+  elephant: { mrt: '象山', note: '沿陡峭階梯前往經典台北 101 觀景點，日落時人潮較多。' },
+  'four-beasts': { mrt: '象山', note: '串聯象山、虎山、豹山與獅山，適合越野跑訓練。' },
+  tiger: { mrt: '後山埤（轉公車）／象山', note: '較清幽的森林步道，可欣賞溪流與城市景色。' },
+  expo: { mrt: '圓山', note: '花博園區與台北市立美術館周邊的平坦鋪面環線。' },
+  dajia: { mrt: '劍南路／大直', note: '基隆河畔寬敞步道，可依目標距離折返。' },
+  meiti: { mrt: '劍南路', note: '平坦河濱步道，可遠眺美麗華摩天輪，並連接大佳河濱公園。' },
+  rainbow: { mrt: '松山', note: '位於彩虹橋與饒河夜市旁的東側河濱步道。' },
+  dadaocheng: { mrt: '北門／大橋頭', note: '沿淡水河向北延伸的河濱步道，適合欣賞日落。' },
+  jiantan: { mrt: '劍潭', note: '圓山大飯店上方的稜線步道，可俯瞰遼闊城市景色。' },
+  jinmianshan: { mrt: '西湖', note: '需攀越岩石，可眺望內湖與台北 101。' },
+  junjianyan: { mrt: '石牌／唭哩岸', note: '短程環線通往北投上方的砂岩突出地形。' },
+  tianmu: { mrt: '芝山（轉公車）', note: '沿舊水管路線約 1,800 階，原路往返三角埔子。' },
+  zhinan: { mrt: '動物園／政大', note: '沿石階登上指南宮，可搭配貓空行程。' },
+  bitan: { mrt: '新店', note: '沿新店溪與吊橋旁的平坦河濱步道。' },
+  zhongzheng: { mrt: '北投（轉公車）', note: '持續爬升至山頂，可眺望關渡平原與淡水河。' },
+  qixing: { mrt: '劍潭／士林轉公車', note: '台北最高峰（1,120 公尺），可見火山噴氣孔與遼闊景色，建議提早出發。' },
+  huangdi: { mrt: '木柵轉公車', note: '裸露岩石的狹窄稜線設有鐵鍊，僅適合有經驗者在乾燥天候前往。' },
+};
