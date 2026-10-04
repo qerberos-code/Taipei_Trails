@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ticket Breakdown Planner"
+  short_description: "Break specs into verifiable tickets"
+  default_prompt: "Use $ticket-breakdown-planner to turn these feature docs into independently verifiable implementation tickets."
