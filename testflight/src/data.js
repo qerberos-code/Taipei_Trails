@@ -14,7 +14,7 @@ export const I18N={
   noPerm:"Hotel lookup needs permission. Pick the nearest MRT station instead.",fail:"Lookup failed. Pick the nearest MRT station or paste coordinates.",
   min:"min",h:"h",
   footer:"Estimates: running uses your pace plus about 6 min per 100 m of climb. Hiking uses 15 min/km plus 10 min per 100 m of climb (Naismith's rule), scaled by hike style. Travel is a straight-line guess for MRT or taxi; tap Navigate for real transit times. Distances and climbs are approximate. Check trail conditions, heat, and typhoon or heavy-rain closures before you go."},
- zh:{title:"台北步道推薦",intro:"告訴我你住哪裡、有多少時間，我會挑出適合的跑步與健行路線，由近到遠排列。",
+ zh:{title:"台北任你/妳跑",intro:"告訴我你住哪裡、有多少時間，我會挑出適合的跑步與健行路線，由近到遠排列。",
   where:"出發地點",hotelPh:"飯店名稱、地址，或貼上 Google 地圖連結",set:"設定",finding:"搜尋中…",stationPick:"或選擇最近的捷運站…",
   activity:"活動",run:"跑步",hike:"健行",either:"都可以",distance:"距離",any:"不限",timeOn:"運動時間",t30:"30 分鐘",t60:"1 小時",t120:"2 小時",t240:"半天",
   maxTravel:"單程交通上限",m15:"15 分鐘",pace:"跑步配速",hikeStyle:"健行步調",relaxed:"輕鬆",steady:"穩定",fast:"快速",

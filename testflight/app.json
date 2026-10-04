@@ -2,7 +2,7 @@
   "expo": {
     "name": "Taipei Trails",
     "slug": "taipei-trail-finder",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -11,7 +11,8 @@
       "bundleIdentifier": "com.qerberos.taipeitrails",
       "buildNumber": "1",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
@@ -43,6 +44,10 @@
         "projectId": "05bd90dc-8899-463d-bbb3-ff1c3bcf97b7"
       }
     },
-    "owner": "qerberos"
+    "owner": "qerberos",
+    "locales": {
+      "en": "./locales/en.json",
+      "zh-Hant": "./locales/zh-Hant.json"
+    }
   }
 }

@@ -24,7 +24,7 @@ export default {
   time60: '1 小時',
   time120: '2 小時',
 
-  title: '台北步道探索',
+  title: '台北任你/妳跑',
   subtitle: '探索大台北路線，和登山助手一起準備裝備、飲水、食物與交通。',
   language: '語言', plan: '你的行程', starting: '出發地',
   locationPlaceholder: '飯店名稱、地址，或貼上 Google Maps 連結', set: '設定', finding: '查詢中…',
