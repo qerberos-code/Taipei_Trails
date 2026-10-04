@@ -21,7 +21,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.qerberos.taipeitrails"
+      "package": "com.qerberos.taipeitrails",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,6 +37,12 @@
           "locationWhenInUsePermission": "Taipei Trails uses your location to find runs and hikes near you."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "05bd90dc-8899-463d-bbb3-ff1c3bcf97b7"
+      }
+    },
+    "owner": "qerberos"
   }
 }
