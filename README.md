@@ -2,6 +2,11 @@
 
 大台北步道探索與登山行前規劃。保留原有跑步／健行距離、時間、出發地篩選，新增右側聊天 sidebar，以 **LangChain JS `createAgent` + OpenAI API** 回答路線、裝備、飲水、食物份量與交通問題。手機用右下角按鈕開啟聊天。
 
+本專案包含兩個版本：
+
+- `index.html` 與 Node.js 後端：網頁版，提供中英文步道篩選與 AI 登山助手。
+- `testflight/`：原生 iPhone App，透過 TestFlight 發佈，提供 GPS 定位、Apple Maps 飯店查詢、捷運站選擇與中英文切換。建置與上傳方式見 [testflight/README.md](testflight/README.md)。
+
 ## 本機啟動
 
 需要 Node.js 22 以上。

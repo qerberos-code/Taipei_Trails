@@ -2,7 +2,7 @@
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Taipei Trail Finder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* Layout: one mobile column. Controls panel on top, ranked route cards below. Basin-and-ridge palette: mist ground, ridge green accent, MRT-orange for travel. */
 :root{
@@ -12,6 +12,7 @@
   --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --f-body:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --f-zh:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#101714; --surface:#17211d; --ink:#e4ece7; --muted:#97a8a0; --line:#2a3832;
@@ -63,6 +64,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .language-control{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:14px}
 .language-control label{font-size:13px;color:var(--muted)}
 .language-control select{width:auto;max-width:170px}
+html[lang="zh-Hant"] body,html[lang="zh-Hant"] .chip,html[lang="zh-Hant"] .btn,html[lang="zh-Hant"] select,html[lang="zh-Hant"] input,html[lang="zh-Hant"] .acts a,html[lang="zh-Hant"] .acts button,html[lang="zh-Hant"] textarea{font-family:var(--f-zh)}
+html[lang="zh-Hant"] header h1,html[lang="zh-Hant"] .ctop h3,html[lang="zh-Hant"] .summary h2{font-family:var(--f-zh);font-weight:700;letter-spacing:.02em}
 header h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,7vw,40px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
 header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:16px}
