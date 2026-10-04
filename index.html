@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Taipei Trail Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one mobile column. Controls panel on top, ranked route cards below. Basin-and-ridge palette: mist ground, ridge green accent, MRT-orange for travel. */
+:root{
+  --bg:#eef2ee; --surface:#ffffff; --ink:#18241f; --muted:#5b6b64; --line:#d3ddd7;
+  --accent:#1f6b4e; --accent-ink:#ffffff; --accent-soft:#dcebe3; --travel:#c25a12; --travel-soft:#fbe9dc;
+  --warn:#9a6b00;
+  --f-display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#101714; --surface:#17211d; --ink:#e4ece7; --muted:#97a8a0; --line:#2a3832;
+  --accent:#5cc49a; --accent-ink:#0c1612; --accent-soft:#1d3a2e; --travel:#f29a5c; --travel-soft:#3a2516; --warn:#e2b54a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101714; --surface:#17211d; --ink:#e4ece7; --muted:#97a8a0; --line:#2a3832;
+  --accent:#5cc49a; --accent-ink:#0c1612; --accent-soft:#1d3a2e; --travel:#f29a5c; --travel-soft:#3a2516; --warn:#e2b54a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:18px}
+header h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,7vw,40px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:16px}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 14px var(--f-body);border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+select,input[type=text]{width:100%;font:15px var(--f-body);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.loc{display:grid;gap:8px}
+.locline{display:flex;gap:8px}
+.locline input{flex:1;min-width:0}
+.btn{font:600 14px var(--f-body);padding:9px 14px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn[disabled]{opacity:.6;cursor:progress}
+.here{display:flex;align-items:center;gap:8px;font-size:14px;padding:8px 10px;border-radius:10px;background:var(--travel-soft);color:var(--ink)}
+.here b{font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--travel);flex:none}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.msg{font-size:13px;color:var(--warn);margin:0}
+.summary{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.summary h2{font-family:var(--f-display);font-weight:600;font-size:20px;margin:0}
+.summary span{color:var(--muted);font-size:13px}
+.list{display:grid;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px}
+.card.top{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ctop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.ctop h3{margin:0;font-family:var(--f-display);font-weight:600;font-size:19px;line-height:1.2}
+.zh{color:var(--muted);font-size:14px;font-weight:400;margin-left:4px}
+.badge{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:440px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{display:grid;gap:1px}
+.stat small{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stat strong{font:500 17px var(--f-mono);font-variant-numeric:tabular-nums}
+.stat.tr strong{color:var(--travel)}
+.note{margin:0;font-size:14px;color:var(--muted)}
+.plan{margin:0;font-size:14px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts a{font:600 14px var(--f-body);text-decoration:none;padding:8px 13px;border-radius:10px;border:1px solid var(--accent)}
+.acts a.go{background:var(--accent);color:var(--accent-ink)}
+.acts a.info{color:var(--accent)}
+.empty{padding:20px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:14px}
+footer{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease both}@keyframes in{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+</head><body>
+
+<div class="wrap">
+  <header>
+    <h1>Taipei Trail Finder</h1>
+    <p>Tell it where you're staying and how much time you have. It picks runs and hikes that fit, nearest first.</p>
+  </header>
+
+  <section class="panel" aria-label="Your plan">
+    <div class="loc">
+      <p class="lbl">Where you are starting</p>
+      <div class="here" id="here"><span class="dot"></span><span id="hereTxt">Taipei 101 / World Trade Center (example)</span></div>
+      <div class="locline">
+        <input type="text" id="hotelQ" placeholder="Hotel name, address, or paste a Google Maps link" autocomplete="off">
+        <button class="btn" id="hotelBtn">Set</button>
+      </div>
+      <p class="msg" id="locMsg" hidden></p>
+      <select id="station" aria-label="Or pick the nearest MRT station">
+        <option value="">Or pick the nearest MRT station…</option>
+      </select>
+    </div>
+
+    <div>
+      <p class="lbl">Activity</p>
+      <div class="chips" data-key="act">
+        <button class="chip" data-v="run">Run</button>
+        <button class="chip" data-v="hike">Hike</button>
+        <button class="chip" data-v="any">Either</button>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <p class="lbl">Distance</p>
+        <div class="chips" data-key="dist">
+          <button class="chip" data-v="3">3 km</button>
+          <button class="chip" data-v="5">5 km</button>
+          <button class="chip" data-v="10">10 km</button>
+          <button class="chip" data-v="0">Any</button>
+        </div>
+      </div>
+      <div>
+        <p class="lbl">Time on the trail</p>
+        <div class="chips" data-key="time">
+          <button class="chip" data-v="30">30 min</button>
+          <button class="chip" data-v="60">1 hr</button>
+          <button class="chip" data-v="120">2 hr</button>
+          <button class="chip" data-v="240">Half day</button>
+          <button class="chip" data-v="0">Any</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <p class="lbl">Max travel each way</p>
+        <div class="chips" data-key="travel">
+          <button class="chip" data-v="15">15 min</button>
+          <button class="chip" data-v="30">30 min</button>
+          <button class="chip" data-v="60">1 hr</button>
+          <button class="chip" data-v="0">Any</button>
+        </div>
+      </div>
+      <div class="row2" style="gap:10px">
+        <div>
+          <p class="lbl">Run pace</p>
+          <select id="pace">
+            <option value="5">5:00 /km</option><option value="5.5">5:30 /km</option>
+            <option value="6">6:00 /km</option><option value="6.5">6:30 /km</option>
+            <option value="7">7:00 /km</option><option value="8">8:00 /km</option>
+          </select>
+        </div>
+        <div>
+          <p class="lbl">Hike style</p>
+          <select id="hike">
+            <option value="1.25">Relaxed</option><option value="1">Steady</option><option value="0.8">Fast</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-live="polite">
+    <div class="summary"><h2 id="sumTitle">Best picks</h2><span id="sumSub"></span></div>
+    <div class="list" id="list" style="margin-top:10px"></div>
+  </section>
+
+  <footer>
+    Estimates: running uses your pace plus about 6 min per 100 m of climb. Hiking uses 15 min/km plus 10 min per 100 m of climb (Naismith's rule), scaled by hike style. Travel is a straight-line guess for MRT or taxi; tap Navigate for real transit times. Distances and climbs are approximate. Check trail conditions, heat, and typhoon or heavy-rain closures before you go.
+  </footer>
+</div>
+
+<script>
+const TRAILS=[
+ {n:"Da'an Forest Park loop",zh:"大安森林公園",t:"run",lat:25.0300,lng:121.5357,km:2.3,gain:0,flex:15,mrt:"Daan Park",note:"Flat shaded loop in the city center. Add laps to reach any distance."},
+ {n:"Elephant Mountain",zh:"象山步道",t:"hike",lat:25.0275,lng:121.5707,km:1.8,gain:180,mrt:"Xiangshan",note:"Steep stairs to the classic Taipei 101 viewpoint. Busy at sunset."},
+ {n:"Four Beasts Mountain loop",zh:"四獸山",t:"both",lat:25.0275,lng:121.5707,km:5.5,gain:380,mrt:"Xiangshan",note:"Links Elephant, Tiger, Leopard and Lion peaks. Good trail-run workout."},
+ {n:"Tiger Mountain trail",zh:"虎山步道",t:"hike",lat:25.0362,lng:121.5810,km:3,gain:200,mrt:"Houshanpi (bus) / Xiangshan",note:"Quieter forest trail with streams and city views."},
+ {n:"Taipei Expo Park & Xinsheng Park",zh:"花博公園",t:"run",lat:25.0705,lng:121.5235,km:3,gain:0,flex:12,mrt:"Yuanshan",note:"Flat paved loops around the Expo grounds and Fine Arts Museum."},
+ {n:"Dajia Riverside Park",zh:"大佳河濱公園",t:"run",lat:25.0730,lng:121.5370,km:5,gain:0,flex:20,mrt:"Jiannan Rd / Dazhi",note:"Wide riverside path on the Keelung River. Out-and-back to any length."},
+ {n:"Meiti Riverside Park",zh:"美堤河濱公園",t:"run",lat:25.0790,lng:121.5550,km:5,gain:0,flex:20,mrt:"Jiannan Rd",note:"Flat river path with views of Miramar Ferris wheel. Connects to Dajia."},
+ {n:"Rainbow Riverside Park",zh:"彩虹河濱公園",t:"run",lat:25.0560,lng:121.5760,km:5,gain:0,flex:16,mrt:"Songshan",note:"East-side riverside path by Rainbow Bridge and Raohe Night Market."},
+ {n:"Dadaocheng Wharf river path",zh:"大稻埕碼頭",t:"run",lat:25.0566,lng:121.5084,km:5,gain:0,flex:20,mrt:"Beimen / Daqiaotou",note:"Tamsui River path heading north. Great at sunset."},
+ {n:"Jiantan Mountain trail",zh:"劍潭山步道",t:"both",lat:25.0838,lng:121.5290,km:3.5,gain:170,mrt:"Jiantan",note:"Ridge above the Grand Hotel with wide city views."},
+ {n:"Jinmianshan (Golden Face Rock)",zh:"金面山",t:"hike",lat:25.0828,lng:121.5672,km:3,gain:250,mrt:"Xihu",note:"Rocky scramble to a big view over Neihu and Taipei 101."},
+ {n:"Junjianyan (Battleship Rock)",zh:"軍艦岩",t:"hike",lat:25.1255,lng:121.5130,km:3,gain:150,mrt:"Shipai / Qilian",note:"Short loop to a sandstone outcrop above Beitou."},
+ {n:"Tianmu Old Trail",zh:"天母古道",t:"hike",lat:25.1300,lng:121.5340,km:4,gain:300,mrt:"Zhishan (then bus)",note:"About 1,800 steps along an old water pipe. Out-and-back to Sanjiao Puzi."},
+ {n:"Zhinan Temple stairs",zh:"指南宮步道",t:"hike",lat:24.9790,lng:121.5800,km:2.5,gain:250,mrt:"Taipei Zoo / Zhengda",note:"Stone stairs up to the Zhinan Temple complex. Combine with Maokong."},
+ {n:"Bitan riverside",zh:"碧潭",t:"run",lat:24.9570,lng:121.5370,km:4,gain:0,flex:12,mrt:"Xindian",note:"Flat path along the Xindian River by the suspension bridge."},
+ {n:"Zhongzheng Mountain",zh:"中正山",t:"hike",lat:25.1490,lng:121.5050,km:4.5,gain:400,mrt:"Beitou (then bus)",note:"Steady climb with a top view over the Guandu plain and Tamsui River."},
+ {n:"Qixing Mountain summit",zh:"七星山",t:"hike",lat:25.1810,lng:121.5480,km:5,gain:450,mrt:"Bus from Jiantan / Shilin",note:"Taipei's highest peak (1,120 m). Volcanic vents and big views. Go early."},
+ {n:"Huangdi Dian ridge",zh:"皇帝殿",t:"hike",lat:24.9940,lng:121.6420,km:7,gain:450,mrt:"Bus from Muzha",note:"Exposed rocky knife-edge ridge with chains. Experienced hikers, dry days only."}
+];
+const STATIONS=[
+ ["Taipei Main Station",25.0478,121.5170],["Ximen",25.0420,121.5081],["Zhongshan",25.0527,121.5203],["Shuanglian",25.0577,121.5206],
+ ["Minquan W. Rd",25.0626,121.5193],["Yuanshan",25.0713,121.5201],["Dongmen",25.0339,121.5287],["Daan",25.0330,121.5435],
+ ["Zhongxiao Fuxing",25.0416,121.5437],["Zhongxiao Dunhua",25.0414,121.5513],["Nanjing Fuxing",25.0520,121.5441],["Songjiang Nanjing",25.0520,121.5330],
+ ["Xinyi Anhe",25.0333,121.5527],["Taipei 101 / World Trade Center",25.0330,121.5637],["City Hall",25.0412,121.5651],["Songshan Airport",25.0630,121.5519],
+ ["Neihu",25.0837,121.5944],["Nangang",25.0521,121.6070],["Gongguan",25.0147,121.5343],["Beitou",25.1318,121.4986],
+ ["Tamsui",25.1678,121.4455],["Banqiao",25.0141,121.4630]
+];
+const S={act:"any",dist:"5",time:"60",travel:"30",pace:"6",hike:"1",
+  origin:{name:"Taipei 101 / World Trade Center (example)",lat:25.0330,lng:121.5637}};
+try{const saved=JSON.parse(localStorage.getItem("ttf")||"null");if(saved)Object.assign(S,saved)}catch(e){}
+const save=()=>{try{localStorage.setItem("ttf",JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+
+const stSel=$("station");
+STATIONS.forEach(([n],i)=>{const o=document.createElement("option");o.value=i;o.textContent=n;stSel.appendChild(o)});
+$("pace").value=S.pace;$("hike").value=S.hike;
+
+function hav(a,b,c,d){const R=6371,r=x=>x*Math.PI/180;const dl=r(c-a),dn=r(d-b);
+  const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function travelMin(km){return Math.round(8+(km*1.35)/22*60)}
+function fmt(m){m=Math.round(m);if(m<60)return m+" min";const h=Math.floor(m/60),r=m%60;return h+"h"+(r?(" "+String(r).padStart(2,"0")):"")}
+function canRun(t){return t.t==="run"||t.t==="both"}
+function canHike(t){return t.t==="hike"||t.t==="both"}
+
+function estimate(t,mode,km){
+  if(mode==="run")return km*(+S.pace)+(t.gain*(km/t.km))/100*6*(t.flex?0:1)+(t.flex?0:0);
+  return (km*15+(t.gain/100)*10)*(+S.hike);
+}
+
+function plan(t,mode){
+  const D=+S.dist,T=+S.time;let km=t.km,how="";
+  const perKm = mode==="run" ? (+S.pace) : 15*(+S.hike);
+  if(t.flex){
+    if(D){ if(D>t.flex) return null; km=D; }
+    else if(T){ km=Math.min(t.flex,Math.max(2,Math.floor(T/perKm*2)/2)); }
+    how = t.km<3 ? `${(km/t.km).toFixed(1).replace(/\.0$/,"")} laps of the ${t.km} km loop` : `Out-and-back, turn around at ${(km/2).toFixed(1).replace(/\.0$/,"")} km`;
+  }else{
+    if(D && (km<D*0.55||km>D*1.6)) return null;
+    how = "Full route";
+  }
+  const mins = t.flex ? km*perKm : estimate(t,mode,km);
+  if(T && mins>T*1.1) return null;
+  let fit=0; if(D) fit+=Math.abs(km-D)/D; if(T) fit+=Math.max(0,(T-mins)/T)*0.5;
+  return {km,mins,how,fit};
+}
+
+function render(){
+  document.querySelectorAll(".chips").forEach(g=>{const k=g.dataset.key;
+    g.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===S[k])))});
+  $("hereTxt").innerHTML="";const b=document.createElement("b");b.textContent=S.origin.name;$("hereTxt").append("From ",b);
+  const o=S.origin,maxT=+S.travel,res=[];
+  TRAILS.forEach(t=>{
+    const modes=[];if((S.act==="run"||S.act==="any")&&canRun(t))modes.push("run");
+    if((S.act==="hike"||S.act==="any")&&canHike(t))modes.push("hike");
+    const d=hav(o.lat,o.lng,t.lat,t.lng),tr=travelMin(d);
+    if(maxT&&tr>maxT)return;
+    let best=null;modes.forEach(m=>{const p=plan(t,m);if(p&&(!best||p.fit<best.fit))best={...p,mode:m}});
+    if(best)res.push({t,d,tr,...best});
+  });
+  res.sort((a,b)=>(a.tr+a.fit*25)-(b.tr+b.fit*25));
+  const list=$("list");list.innerHTML="";
+  const parts=[];if(+S.dist)parts.push(S.dist+" km");if(+S.time)parts.push(fmt(+S.time)+" on trail");if(+S.travel)parts.push("≤ "+S.travel+" min away");
+  $("sumTitle").textContent=res.length?`${res.length} route${res.length>1?"s":""} that fit`:"No exact match";
+  $("sumSub").textContent=parts.join(" · ");
+  if(!res.length){list.innerHTML='<div class="empty">Nothing fits all three limits. Try "Any" for travel time, or a longer time window.</div>';return}
+  res.slice(0,8).forEach((r,i)=>{
+    const t=r.t,c=document.createElement("article");c.className="card"+(i===0?" top":"");
+    const dest=`${t.lat},${t.lng}`,orig=`${o.lat},${o.lng}`;
+    const nav=`https://www.google.com/maps/dir/?api=1&origin=${orig}&destination=${dest}&travelmode=transit`;
+    const info=`https://www.google.com/search?q=${encodeURIComponent(t.zh+" "+t.n+" trail")}`;
+    const total=r.mins+r.tr*2;
+    c.innerHTML=`<div class="ctop"><h3></h3><span class="badge">${i===0?"Top pick · ":""}${r.mode==="run"?"Run":"Hike"}</span></div>
+      <div class="stats">
+        <div class="stat"><small>Distance</small><strong>${r.km.toFixed(1)} km</strong></div>
+        <div class="stat"><small>Climb</small><strong>${t.flex?0:t.gain} m</strong></div>
+        <div class="stat"><small>On trail</small><strong>${fmt(r.mins)}</strong></div>
+        <div class="stat tr"><small>Travel each way</small><strong>${fmt(r.tr)}</strong></div>
+      </div>
+      <p class="plan"></p><p class="note"></p>
+      <div class="acts"><a class="go" target="_blank" rel="noopener" href="${nav}">Navigate</a><a class="info" target="_blank" rel="noopener" href="${info}">Trail info</a></div>`;
+    const h=c.querySelector("h3");h.textContent=t.n;const z=document.createElement("span");z.className="zh";z.textContent=t.zh;h.append(z);
+    c.querySelector(".plan").textContent=`${r.how}. Nearest MRT: ${t.mrt}. Door to door about ${fmt(total)}.`;
+    c.querySelector(".note").textContent=t.note;
+    list.appendChild(c);
+  });
+}
+
+document.querySelectorAll(".chips").forEach(g=>g.addEventListener("click",e=>{
+  const b=e.target.closest(".chip");if(!b)return;S[g.dataset.key]=b.dataset.v;save();render()}));
+$("pace").onchange=e=>{S.pace=e.target.value;save();render()};
+$("hike").onchange=e=>{S.hike=e.target.value;save();render()};
+stSel.onchange=e=>{if(e.target.value==="")return;const s=STATIONS[+e.target.value];
+  S.origin={name:s[0]+" MRT",lat:s[1],lng:s[2]};hideMsg();save();render()};
+
+function showMsg(t){const m=$("locMsg");m.textContent=t;m.hidden=false}
+function hideMsg(){$("locMsg").hidden=true}
+
+let samplerP=null;
+function getSampler(){ if(!samplerP) samplerP=(window.claude?.use?window.claude.use("sample"):Promise.resolve(null)).catch(()=>null); return samplerP }
+
+async function setHotel(){
+  const q=$("hotelQ").value.trim();if(!q)return;hideMsg();
+  const m=q.match(/@?(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{2,3}\.\d{3,})/);
+  if(m){S.origin={name:"Pinned location",lat:+m[1],lng:+m[2]};save();render();$("hotelQ").value="";return}
+  const btn=$("hotelBtn");btn.disabled=true;btn.textContent="Finding…";
+  try{
+    const sample=await getSampler();
+    if(!sample){showMsg("Hotel lookup isn't available here. Paste coordinates or a Google Maps link, or pick the nearest MRT station.");return}
+    const r=await sample.json(`You geocode places in the Taipei / New Taipei area of Taiwan. Place: "${q.replace(/"/g,"'")}". Reply with JSON only: {"found":boolean,"name":"short display name","lat":number,"lng":number}. Use your best knowledge of the hotel or address location. If you do not recognize it, return found:false.`,{modelTier:"quick"});
+    if(r&&r.found&&isFinite(r.lat)&&isFinite(r.lng)&&r.lat>24.6&&r.lat<25.4&&r.lng>121.2&&r.lng<122.1){
+      S.origin={name:(r.name||q)+" (approx.)",lat:+r.lat,lng:+r.lng};save();render();$("hotelQ").value="";stSel.value="";
+    }else showMsg("Couldn't place that one. Try the full hotel name with the district, paste a Google Maps link, or pick the nearest MRT station.");
+  }catch(e){showMsg(e&&e.code==="not_granted"?"Hotel lookup needs permission. Pick the nearest MRT station instead.":"Lookup failed. Pick the nearest MRT station or paste coordinates.")}
+  finally{btn.disabled=false;btn.textContent="Set"}
+}
+$("hotelBtn").onclick=setHotel;
+$("hotelQ").addEventListener("keydown",e=>{if(e.key==="Enter")setHotel()});
+render();
+</script>
+</body></html>
