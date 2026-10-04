@@ -1,6 +1,22 @@
-# Taipei Trail Finder
+# 台北任你/妳跑 · Taipei Trails
 
-大台北步道探索與登山行前規劃。保留原有跑步／健行距離、時間、出發地篩選，新增右側聊天 sidebar，以 **LangChain JS `createAgent` + OpenAI API** 回答路線、裝備、飲水、食物份量與交通問題。手機用右下角按鈕開啟聊天。
+**線上版：https://trails.angus-chen.com**
+
+大台北跑步與健行路線推薦，加上 AI 登山助手。輸入出發地（飯店、捷運站或座標）、想跑多遠（3／5／10 公里）、有多少時間，立刻找出最適合的路線，由近到遠排列，並可與 AI 討論裝備、飲水、食物與交通。
+
+> **English:** Only an hour free in Taipei? 台北任你/妳跑 finds the run or hike that fits your time, distance and hotel location, then lets you plan gear, water, food and transport with an AI hiking assistant. Live at https://trails.angus-chen.com, with an iPhone version on TestFlight.
+
+![在台北的 OpenAI 活動中開發 台北任你/妳跑](docs/images/team-taipei.jpg)
+
+*2026 年 10 月，在台北的 OpenAI 活動現場開發本專案。*
+
+## 要解決的問題
+
+出差或旅行到台北，行程滿檔，好不容易空出一小時，想去跑步或爬山，卻不熟悉這座城市：飯店附近有哪條步道？5 公里的路線來得及在下個會議前跑完嗎？查地圖、看部落格和評論，寶貴的時間就這樣溜走。本專案一鍵給出答案，連交通時間都算好。
+
+## 技術說明
+
+網頁版保留跑步／健行距離、時間、出發地篩選，右側聊天 sidebar 以 **LangChain JS `createAgent` + OpenAI API** 回答路線、裝備、飲水、食物份量與交通問題。手機用右下角按鈕開啟聊天。
 
 本專案包含兩個版本：
 
@@ -19,6 +35,15 @@ npm start
 ```
 
 開啟 http://127.0.0.1:3000。`OPENAI_MODEL` 預設 `gpt-4.1-mini`，可改成帳戶可用且支援 tool calling 的 OpenAI 模型。`npm run dev` 啟用 Node watch；`npm test` 執行不消耗 API 額度的測試。
+
+## 線上部署（Vercel）
+
+正式站 https://trails.angus-chen.com 部署在 Vercel（Qerberos 團隊，專案 `taipei-trails`），每次推送到 `main` 會自動重新部署。
+
+- `api/chat.js`、`api/health.js`：Vercel Functions，透過 `api/_handler.js` 共用 `server/index.js` 的同一套請求處理邏輯。
+- `vercel.json`：函式逾時設定（聊天 60 秒）；`.vercelignore` 排除 `testflight/`、`test/`、`docs/`。
+- 環境變數 `OPENAI_API_KEY`、`OPENAI_MODEL` 只設定在 Vercel 專案設定中，不進入程式碼或 Git。
+- 網域：Cloudflare DNS 以 CNAME `trails` 指向 Vercel（DNS only）。
 
 API key 只在 Node.js 伺服器讀取；靜態檔案採白名單，不提供 `.env`、伺服器程式或依賴目錄。聊天需要後端，因此 GitHub Pages 單獨託管不能執行 AI。
 
@@ -62,10 +87,10 @@ API key 只在 Node.js 伺服器讀取；靜態檔案採白名單，不提供 `.
 - 飲水攜帶量以每小時 0.5 公升作為起點，炎熱／天氣未知用 0.5～1 公升範圍，加 0.5 公升備用水後進位。點心與餐食份數是專案打包估算，非營養處方。會依時長與人數提供每人與團體數量。
 - 行前準備參考 [NPS Hiking Safety](https://www.nps.gov/grsm/planyourvisit/hikingsafety.htm) 與 [NPS Ten Essentials](https://www.nps.gov/articles/10essentials.htm)。美國公園建議僅作為一般規劃參考，不能代表某條台灣步道的即時情況。
 - 交通只提供既有附近捷運／轉乘提示與 Google Maps 導航，沒有即時班次、車資、停車資料。
-- 尚未實作大台北互動地圖、實際路線軌跡、官方路況／封閉公告、即時天氣、持久化聊天、登入和線上部署。
+- 尚未實作大台北互動地圖、實際路線軌跡、官方路況／封閉公告、即時天氣、持久化聊天與登入。
 - 原有飯店名稱查詢仍依賴 Claude 環境的 `window.claude.use`；一般瀏覽器請用座標、包含座標的 Google Maps 網址或捷運站。尚不支援短網址解析或正式地理編碼 API。
 
-伺服器預設僅綁定 `127.0.0.1`。公開部署前仍需要身分驗證／用量限制與 HTTPS。
+本機伺服器預設僅綁定 `127.0.0.1`。線上版已透過 Vercel 提供 HTTPS，但聊天仍是公開的且尚無用量限制，請在 OpenAI 帳戶設定每月花費上限。
 
 ## 文件
 
